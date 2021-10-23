@@ -16,15 +16,51 @@ self.addEventListener('install', result =>{
     })
 })
 
-self.addEventListener("fetch", (eventFecth)=>{
+self.addEventListener("fetch", (eventFetch)=>{
 //solo va a responder lo que se encuentra en cache
 //eventFecth.respondWith(
   //  caches.match(eventFecth.request)
 //)
-eventFecth.respondWith(fetch(eventFecth.request)
-
-);
+//eventFetch.respondWith(fetch(eventFetch.request)
+//);
+//cache first: Primero se va a buscar las peticiones al cache y si no estan se va a la red
+/*const res = caches.match(eventFetch.request)
+.then(cacheResponse=>{
+    return cacheResponse;
+    if (cacheResponse) 
+    {
+    return(cacheResponse)    
+    }else{
+        return fetch(eventFetch.request)
+    }
+    return cacheResponse ? cacheResponse : fetch(eventFetch.request)
 })
+.catch(cacheError=>{
+console.error('Catch Error', cacheError);
+});
+eventFetch.respondWith(res);*/
+//Network First: Primero hace un fetch a buscar en la red si no busca en el cache
+const res = fetch(eventFetch.request)
+.then(networkResponse=>{
+    return networkResponse;
+    if (networkResponse) 
+    {
+    return(cacheResponse)    
+    }else{
+        return caches.match(eventFetch.request)
+    }
+    return networkResponse ? networkResponse : caches.match(eventFetch.request)
+})
+.catch(networkError=>{
+console.error('Network Error', networkError);
+});
+eventFetch.respondWith(res)
+
+})
+//function handleEror(){    
+//}
+
+
 /*self.addEventListener("fetch", (event)=>{
     event.respondWith(
         caches.match(event.request).then((param)=>{
